@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Desk - Logic Circuit Simulator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="icon" href="logo-square.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== Top bar ===== -->
+<header class="bar">
+  <div class="brand">
+    <div class="logo"><img src="C:\Users\hp\Downloads\logo (1).png" alt="Digital Desk logo" onerror="this.replaceWith(document.createTextNode('DD'))"></div>
+    <div>
+      <div class="brand-name">DIGITAL DESK</div>
+      <div class="brand-sub">Digital Logic Circuit Simulator</div>
+    </div>
+  </div>
+
+  <div class="tools">
+    <div class="group">
+      <button type="button" class="btn run" id="btnRun" title="Start or stop the clocks">Running</button>
+      <button type="button" class="btn" id="btnStep" title="Move every clock one step">Step</button>
+    </div>
+    <div class="group">
+      <button type="button" class="btn" id="btnPrev" title="Go back one change (Ctrl+Z)">Previous</button>
+      <button type="button" class="btn" id="btnNext" title="Redo the change (Ctrl+Y)">Next</button>
+    </div>
+    <select id="presets" class="btn" aria-label="Circuit examples">
+      <option value="">Presets / Circuit Examples...</option>
+      <option value="half">Half adder</option>
+      <option value="full">Full adder</option>
+      <option value="mux">2:1 Multiplexer</option>
+      <option value="nand">XOR made from NAND gates</option>
+      <option value="latch">SR latch (memory)</option>
+      <option value="clock">Clock blinker</option>
+    </select>
+    <button type="button" class="btn primary" id="btnTable">Truth Table</button>
+    <button type="button" class="btn" id="btnDelete" title="Delete the selected part (Delete key)">Delete</button>
+    <button type="button" class="btn" id="btnClear">Clear</button>
+    <button type="button" class="btn" id="btnSave" title="Download the circuit as a file">Save</button>
+    <button type="button" class="btn" id="btnOpen" title="Open a saved circuit">Open</button>
+    <button type="button" class="btn" id="themeBtn">Light mode</button>
+    <input type="file" id="fileInput" accept=".json,application/json" hidden>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- ===== Components list ===== -->
+  <aside class="side">
+    <div class="side-scroll">
+      <h2>COMPONENTS</h2>
+
+      <h3>INPUTS / OUTPUTS</h3>
+      <div class="pal-grid">
+        <button type="button" class="pal-item" data-type="SWITCH" draggable="true"><b>Switch</b><small>Toggle Switch</small></button>
+        <button type="button" class="pal-item" data-type="CONST" draggable="true"><b class="amber">1 / 0</b><small>High / Low</small></button>
+        <button type="button" class="pal-item" data-type="CLOCK" draggable="true"><b class="amber">Clock</b><small>Auto toggle</small></button>
+        <button type="button" class="pal-item" data-type="LED" draggable="true"><b class="amber">LED</b><small>Output Indicator</small></button>
+      </div>
+
+      <h3>BASIC LOGIC GATES</h3>
+      <div class="pal-grid">
+        <button type="button" class="pal-item" data-type="AND" draggable="true"><b>AND</b><small>Dual Input</small></button>
+        <button type="button" class="pal-item" data-type="OR" draggable="true"><b>OR</b><small>Dual Input</small></button>
+        <button type="button" class="pal-item wide" data-type="NOT" draggable="true"><b>NOT (Inverter)</b><small>Single Input</small></button>
+      </div>
+
+      <h3>UNIVERSAL AND EXCLUSIVE</h3>
+      <div class="pal-grid">
+        <button type="button" class="pal-item" data-type="NAND" draggable="true"><b class="violet">NAND</b><small>Inv. AND</small></button>
+        <button type="button" class="pal-item" data-type="NOR" draggable="true"><b class="violet">NOR</b><small>Inv. OR</small></button>
+        <button type="button" class="pal-item" data-type="XOR" draggable="true"><b class="violet">XOR</b><small>Exclusive OR</small></button>
+        <button type="button" class="pal-item" data-type="XNOR" draggable="true"><b class="violet">XNOR</b><small>Exclusive NOR</small></button>
+      </div>
+    </div>
+
+    <div class="info" id="info">
+      <div class="info-title" id="infoTitle"></div>
+      <p id="infoText"></p>
+      <code id="infoFormula"></code>
+    </div>
+  </aside>
+
+  <!-- ===== Drawing area ===== -->
+  <main id="canvas">
+    <div id="world"><svg id="wires"></svg></div>
+
+    <div class="legend">
+      <span class="dot on"></span> HIGH (1): <b class="cyan">Cyan Wire</b>
+      <span class="dot"></span> LOW (0): <b>Dark Wire</b>
+    </div>
+
+    <div class="empty" id="empty">Press a part on the left to add it, or pick a preset above.</div>
+
+    <div class="zoombox">
+      <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+      <button type="button" id="zoomOut" aria-label="Zoom out">-</button>
+      <span id="zoomText">100%</span>
+      <button type="button" id="zoomFit" title="Fit the circuit on screen">Fit</button>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+</div>
+
+<footer class="foot">&copy; 2026 MITS Microproject, CST 147 &amp; 149</footer>
+
+<!-- ===== Truth table window ===== -->
+<dialog id="tableDlg">
+  <h2>Truth table</h2>
+  <div id="ttBody"></div>
+  <form method="dialog"><button class="btn primary" type="submit">Close</button></form>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
