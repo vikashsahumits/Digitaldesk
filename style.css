@@ -1,0 +1,173 @@
+/* Digital Desk - styles. Colours live in variables so dark and light mode can switch. */
+
+:root[data-theme="dark"] {
+  --bg: #070b14; --canvas: #070b14; --dot: #1c2638;
+  --panel: #0f1624; --card: #161e2e; --card-head: #1b2438;
+  --line: #26324a; --text: #e6edf7; --mute: #8a99b3;
+  --wire-on: #22d3ee; --wire-off: #4a5670;
+  --gate: #6ea8ff; --gate2: #b48cff; --led: #facc15;
+  --accent: #7c5cff; --glow: rgba(124, 92, 255, 0.35);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f1f5fb; --canvas: #fbfdff; --dot: #cfd9e8;
+  --panel: #ffffff; --card: #ffffff; --card-head: #eef3fb;
+  --line: #cbd7e8; --text: #0f1c33; --mute: #5a6b86;
+  --wire-on: #0891b2; --wire-off: #9fb0c8;
+  --gate: #1668ff; --gate2: #7c3aed; --led: #f59e0b;
+  --accent: #6d4aff; --glow: rgba(109, 74, 255, 0.3);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font-family: "Bricolage Grotesque", system-ui, "Segoe UI", sans-serif;
+}
+h2, h3 { margin: 0; }
+.cyan { color: var(--wire-on); }
+
+/* ----- top bar ----- */
+.bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.logo {
+  height: 52px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; display: grid; place-items: center;
+  background: linear-gradient(135deg, #22d3ee, #7c5cff); color: #fff; font: 700 14px "JetBrains Mono", monospace;
+}
+.brand-name { font-weight: 700; font-size: 1.15rem; color: var(--wire-on); letter-spacing: 0.04em; }
+.brand-sub { font: 500 10px "JetBrains Mono", monospace; color: var(--mute); }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.group { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+
+.btn {
+  font: inherit; font-size: 0.9rem; color: var(--text); background: var(--card);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+.btn.run { background: #10b981; border-color: #10b981; color: #fff; font-weight: 700; }
+.btn.run.paused { background: #f59e0b; border-color: #f59e0b; color: #2b1d00; }
+button:focus-visible, select:focus-visible, .pal-item:focus-visible { outline: 3px solid var(--wire-on); outline-offset: 2px; }
+
+/* ----- layout ----- */
+.app { flex: 1; min-height: 0; display: grid; grid-template-columns: 250px 1fr; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 210px 1fr; }
+}
+.side { display: flex; flex-direction: column; min-height: 0; background: var(--panel); border-right: 1px solid var(--line); }
+.side-scroll { flex: 1; overflow-y: auto; padding: 14px 12px; }
+.side h2 { font: 700 12px "JetBrains Mono", monospace; color: var(--mute); letter-spacing: 0.08em; margin-bottom: 8px; }
+.side h3 { font: 700 11px "JetBrains Mono", monospace; color: var(--wire-on); letter-spacing: 0.08em; margin: 14px 0 8px; }
+.pal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pal-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: var(--text); cursor: grab; font: inherit;
+}
+.pal-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+.pal-item.wide { grid-column: span 2; }
+.pal-item b { font: 700 14px "JetBrains Mono", monospace; color: var(--gate); }
+.pal-item b.violet { color: var(--gate2); }
+.pal-item b.amber { color: var(--led); }
+.pal-item small { color: var(--mute); font-size: 11px; }
+.info { padding: 12px; border-top: 1px solid var(--line); background: var(--panel); }
+.info-title { font-weight: 700; color: var(--wire-on); margin-bottom: 4px; }
+.info p { margin: 0 0 8px; font-size: 13px; color: var(--mute); }
+.info code { display: block; text-align: center; padding: 7px; border-radius: 8px; background: var(--bg); color: var(--gate); font: 700 13px "JetBrains Mono", monospace; }
+
+/* ----- drawing area ----- */
+#canvas {
+  position: relative; overflow: hidden; touch-action: none; cursor: grab; min-height: 0;
+  background-color: var(--canvas);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+#world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+#wires { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: visible; pointer-events: none; }
+.wire { fill: none; stroke: var(--wire-off); stroke-width: 3.5; stroke-linecap: round; }
+.wire.high { stroke: var(--wire-on); filter: drop-shadow(0 0 4px var(--wire-on)); }
+.wire.sel { stroke: var(--accent); stroke-dasharray: 7 5; }
+.wire.temp { stroke: var(--gate); stroke-dasharray: 6 5; }
+.hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
+
+.legend, .zoombox {
+  position: absolute; left: 16px; display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border: 1px solid var(--line); border-radius: 12px;
+  background: color-mix(in srgb, var(--panel) 90%, transparent); font-size: 13px;
+}
+.legend { top: 14px; }
+.legend b { font: 700 12px "JetBrains Mono", monospace; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wire-off); }
+.dot.on { background: var(--wire-on); }
+.zoombox { bottom: 14px; }
+.zoombox button { font: inherit; color: var(--text); background: transparent; border: 0; padding: 4px 8px; cursor: pointer; border-radius: 6px; }
+.zoombox button:hover { background: var(--card-head); }
+.zoombox span { min-width: 40px; text-align: center; font-size: 13px; }
+.empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--mute); pointer-events: none; text-align: center; padding: 20px; }
+.toast {
+  position: absolute; right: 16px; top: 14px; max-width: 70%; padding: 8px 14px; border-radius: 10px;
+  background: var(--accent); color: #fff; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ----- parts on the board ----- */
+.node {
+  position: absolute; width: 112px; height: 68px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 10px; user-select: none; cursor: grab;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+.node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+.n-head {
+  height: 24px; line-height: 23px; padding: 0 6px; text-align: center; font-size: 11px; color: var(--mute);
+  background: var(--card-head); border-bottom: 1px solid var(--line); border-radius: 9px 9px 0 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.n-label[contenteditable="true"] { outline: 2px solid var(--accent); background: var(--bg); color: var(--text); padding: 1px 4px; border-radius: 4px; cursor: text; }
+.n-body { height: 42px; display: flex; align-items: center; justify-content: center; }
+.n-type { font: 700 14px "JetBrains Mono", monospace; color: var(--gate); }
+.n-type.violet { color: var(--gate2); }
+
+.port {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%; z-index: 2; cursor: crosshair;
+  background: var(--card); border: 2px solid var(--wire-off);
+}
+.port.in { left: -7px; }
+.port.out { right: -7px; }
+.port:hover { transform: scale(1.4); border-color: var(--gate); }
+.port.high { background: var(--wire-on); border-color: var(--wire-on); box-shadow: 0 0 8px var(--wire-on); }
+
+.toggle { position: relative; width: 46px; height: 22px; border-radius: 12px; background: var(--wire-off); cursor: pointer; transition: background 0.15s; }
+.knob { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left 0.15s; }
+.toggle.on { background: var(--wire-on); }
+.toggle.on .knob { left: 27px; }
+.const { font: 700 22px "JetBrains Mono", monospace; background: none; border: 0; color: var(--wire-off); cursor: pointer; padding: 0 12px; }
+.const.on { color: var(--led); }
+.clock { font: 700 13px "JetBrains Mono", monospace; color: var(--wire-off); }
+.clock.on { color: var(--led); }
+.led { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--wire-off); }
+.led.on { background: var(--led); border-color: var(--led); box-shadow: 0 0 16px var(--led); }
+
+/* ----- footer and truth table window ----- */
+.foot { padding: 8px; text-align: center; font-size: 13px; color: var(--mute); background: var(--panel); border-top: 1px solid var(--line); }
+dialog { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 14px; padding: 18px; width: min(92vw, 620px); }
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+dialog h2 { margin-bottom: 12px; }
+dialog form { margin-top: 14px; text-align: right; }
+.tt-scroll { overflow: auto; max-height: 50vh; }
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 6px 12px; text-align: center; border-bottom: 1px solid var(--line); font-family: "JetBrains Mono", monospace; }
+th { color: var(--wire-on); font-size: 0.85rem; }
+td.one { color: var(--led); font-weight: 700; }
+tr.now td { background: var(--glow); }
+.expr { margin: 10px 0 0; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+.expr b { color: var(--wire-on); }
+.note { color: var(--mute); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* logo picture (put your logo.png next to index.html) */
+.logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; display: block; }
