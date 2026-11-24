@@ -1,6 +1,6 @@
 /* Digital Desk - styles. Colours live in variables so dark and light mode can switch. */
 
-:root[data-theme="light"] {
+:root[data-theme="dark"] {
   --bg: #070b14; --canvas: #070b14; --dot: #1c2638;
   --panel: #0f1624; --card: #161e2e; --card-head: #1b2438;
   --line: #26324a; --text: #e6edf7; --mute: #8a99b3;
