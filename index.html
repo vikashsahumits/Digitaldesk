@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Digital Desk - Logic Circuit Simulator</title>
-  <link rel="icon" type="image/png" href="assets/logo1.png">
+<link rel="icon" type="image/png" href="C:\Users\hp\Downloads\logo1.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="icon" href="logo-square.png">
 <link rel="stylesheet" href="style.css">
@@ -13,38 +13,63 @@
 
 <!-- ===== Top bar ===== -->
 <header class="bar">
-  <div class="brand">
-    <div class="logo"><img src="assets/logo (1).png" alt="Digital Desk logo" onerror="this.replaceWith(document.createTextNode('DD'))"></div>
-    <div>
-      <div class="brand-name">DIGITAL DESK</div>
-      <div class="brand-sub">Digital Logic Circuit Simulator</div>
-    </div>
-  </div>
+  <div class="logo"><img src="C:\Users\hp\Downloads\logo (1).png" alt="Digital Desk logo" onerror="this.replaceWith(document.createTextNode('DD'))"></div>
 
-  <div class="tools">
-    <div class="group">
-      <button type="button" class="btn run" id="btnRun" title="Start or stop the clocks">Running</button>
-      <button type="button" class="btn" id="btnStep" title="Move every clock one step">Step</button>
+  <div class="top-right">
+    <div class="top-row">
+      <div class="brand">
+        <div class="brand-name">DIGITAL DESK</div>
+        <div class="brand-sub">Simulator of digital logic design and Boolean algebra</div>
+      </div>
+      <button type="button" class="btn" id="themeBtn" title="Switch between light and dark"></button>
     </div>
-    <div class="group">
-      <button type="button" class="btn" id="btnPrev" title="Go back one change (Ctrl+Z)">Previous</button>
-      <button type="button" class="btn" id="btnNext" title="Redo the change (Ctrl+Y)">Next</button>
-    </div>
-    <select id="presets" class="btn" aria-label="Circuit examples">
-      <option value="">Presets / Circuit Examples...</option>
-      <option value="half">Half adder</option>
-      <option value="full">Full adder</option>
-      <option value="mux">2:1 Multiplexer</option>
-      <option value="nand">XOR made from NAND gates</option>
-      <option value="latch">SR latch (memory)</option>
-      <option value="clock">Clock blinker</option>
-    </select>
-    <button type="button" class="btn primary" id="btnTable">Truth Table</button>
-    <button type="button" class="btn" id="btnDelete" title="Delete the selected part (Delete key)">Delete</button>
-    <button type="button" class="btn" id="btnClear">Clear</button>
-    <button type="button" class="btn" id="btnSave" title="Download the circuit as a file">Save</button>
-    <button type="button" class="btn" id="btnOpen" title="Open a saved circuit">Open</button>
-    <button type="button" class="btn" id="themeBtn">Light mode</button>
+
+    <!-- navigation bar: tools in groups -->
+    <nav class="navbar" aria-label="Tools">
+      <div class="group">
+        <span class="cap">Simulation</span>
+        <div class="row">
+          <button type="button" class="btn run" id="btnRun" title="Start or stop the clocks"><span id="runIcon"></span><span id="runText">Running</span></button>
+          <button type="button" class="btn" id="btnStep" title="Move every clock one step"><svg class="ico" viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20" fill="currentColor"/><path d="M19 5v14"/></svg>Step</button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="cap">History</span>
+        <div class="row">
+          <button type="button" class="btn" id="btnPrev" title="Go back one change (Ctrl+Z)"><svg class="ico" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>Previous</button>
+          <button type="button" class="btn" id="btnNext" title="Redo the change (Ctrl+Y)">Next<svg class="ico right" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/></svg></button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="cap">Circuit</span>
+        <div class="row">
+          <select id="presets" class="btn" aria-label="Circuit examples">
+            <option value="">Presets...</option>
+            <option value="half">Half adder</option>
+            <option value="full">Full adder</option>
+            <option value="mux">2:1 Multiplexer</option>
+            <option value="nand">XOR made from NAND gates</option>
+            <option value="latch">SR latch (memory)</option>
+            <option value="clock">Clock blinker</option>
+          </select>
+          <button type="button" class="btn primary" id="btnTable"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>Truth Table</button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="cap">Edit</span>
+        <div class="row">
+          <button type="button" class="btn" id="btnDelete" title="Delete the selected part (Delete key)"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Delete</button>
+          <button type="button" class="btn" id="btnClear" title="Remove everything"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg>Clear</button>
+        </div>
+      </div>
+      <div class="group">
+        <span class="cap">File</span>
+        <div class="row">
+          <button type="button" class="btn" id="btnSave" title="Download the circuit as a file"><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg>Save</button>
+          <button type="button" class="btn" id="btnOpen" title="Open a saved circuit"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg>Open</button>
+        </div>
+      </div>
+    </nav>
     <input type="file" id="fileInput" accept=".json,application/json" hidden>
   </div>
 </header>
@@ -53,6 +78,7 @@
 
   <!-- ===== Components list ===== -->
   <aside class="side">
+    <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="Drag to make the components list wider or narrower" tabindex="0" title="Drag to resize (double-click to reset)"></div>
     <div class="side-scroll">
       <h2>COMPONENTS</h2>
 
@@ -68,7 +94,7 @@
       <div class="pal-grid">
         <button type="button" class="pal-item" data-type="AND" draggable="true"><b>AND</b><small>Dual Input</small></button>
         <button type="button" class="pal-item" data-type="OR" draggable="true"><b>OR</b><small>Dual Input</small></button>
-        <button type="button" class="pal-item wide" data-type="NOT" draggable="true"><b>NOT (Inverter)</b><small>Single Input</small></button>
+        <button type="button" class="pal-item" data-type="NOT" draggable="true"><b>NOT</b><small>Inverter</small></button>
       </div>
 
       <h3>UNIVERSAL AND EXCLUSIVE</h3>
