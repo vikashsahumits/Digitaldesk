@@ -10,7 +10,7 @@ function $(id) {
 // ===================================================
 var NODE_W = 112;   // width of a part
 var HEAD_H = 24;    // height of the title strip
-var BODY_H = 44;    // height of the body
+var BODY_H = 56;    // height of the body
 
 var TYPES = {
   SWITCH: { inputs: 0, title: "Toggle Switch", info: "A switch you can flip. Press it to change between 0 and 1.", formula: "Y = switch" },
@@ -118,10 +118,72 @@ function settle() {
 // ===================================================
 // 4. Drawing parts and wires
 // ===================================================
+// height of a dot, counted from the top of the part
+// (these numbers match the lines drawn inside gateShape)
 function portY(type, index) {
-  if (TYPES[type].inputs === 2) return HEAD_H + (index === 0 ? 12 : 32);
-  return HEAD_H + BODY_H / 2;
+  if (TYPES[type].inputs === 2) return HEAD_H + (index === 0 ? 19 : 39);
+  return HEAD_H + 29;
 }
+
+// ----- gate symbols (drawn as SVG, 112 wide and 56 tall) -----
+function gateShape(type) {
+  var violet = (type === "NAND" || type === "NOR" || type === "XOR" || type === "XNOR") ? " violet" : "";
+  var inverted = (type === "NAND" || type === "NOR" || type === "XNOR" || type === "NOT");
+  var body = "";
+  var inX;   // where the input lines stop
+  var tip;   // where the symbol ends on the right
+
+  if (type === "AND" || type === "NAND") {
+    body = '<path class="sym-body' + violet + '" d="M30,8 H52 A20,20 0 0 1 52,48 H30 Z"/>';
+    inX = 30; tip = 72;
+  } else if (type === "OR" || type === "NOR") {
+    body = '<path class="sym-body' + violet + '" d="M26,8 C46,8 64,16 76,28 C64,40 46,48 26,48 C34,38 34,18 26,8 Z"/>';
+    inX = 31; tip = 76;
+  } else if (type === "XOR" || type === "XNOR") {
+    body = '<path class="sym-body' + violet + '" d="M32,8 C52,8 70,16 82,28 C70,40 52,48 32,48 C40,38 40,18 32,8 Z"/>' +
+           '<path class="sym-arc" d="M24,8 C32,18 32,38 24,48"/>';
+    inX = 28; tip = 82;
+  } else {   // NOT
+    body = '<path class="sym-body" d="M34,10 L34,46 L78,28 Z"/>';
+    inX = 34; tip = 78;
+  }
+
+  var lines = "";
+  if (TYPES[type].inputs === 2) lines += '<path class="sym-line" d="M0,18 H' + inX + ' M0,38 H' + inX + '"/>';
+  else lines += '<path class="sym-line" d="M0,28 H' + inX + '"/>';
+
+  var outStart = tip;
+  if (inverted) {
+    body += '<circle class="sym-body' + violet + '" cx="' + (tip + 5) + '" cy="28" r="5"/>';
+    outStart = tip + 10;
+  }
+  lines += '<path class="sym-line" d="M' + outStart + ',28 H112"/>';
+  return lines + body;
+}
+
+// small pictures for the parts list on the left
+function paletteIcon(type) {
+  if (TYPES[type].fn) return '<svg class="sym" viewBox="22 4 72 48">' + gateShape(type) + "</svg>";
+  if (type === "SWITCH") return '<svg class="sym" viewBox="0 0 66 40"><rect class="sym-body" x="10" y="12" width="46" height="18" rx="9"/><circle class="sym-on" cx="44" cy="21" r="6"/></svg>';
+  if (type === "CONST") return '<svg class="sym" viewBox="0 0 66 40"><text class="sym-text" x="33" y="27" text-anchor="middle">1 0</text></svg>';
+  if (type === "CLOCK") return '<svg class="sym" viewBox="0 0 66 40"><path class="sym-led" d="M8,30 H18 V12 H30 V30 H42 V12 H54 V30 H60" stroke-linejoin="round"/></svg>';
+  return '<svg class="sym" viewBox="0 0 66 40"><circle class="sym-led" cx="33" cy="20" r="11"/><path class="sym-led" d="M33,5 V1 M48,20 H53 M13,20 H18"/></svg>';
+}
+
+function addPaletteIcons() {
+  var items = document.querySelectorAll(".pal-item");
+  for (var i = 0; i < items.length; i++) {
+    items[i].insertAdjacentHTML("afterbegin", paletteIcon(items[i].getAttribute("data-type")));
+  }
+}
+
+// small icons for the Run and theme buttons
+var ICON = {
+  play: '<svg class="ico" viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20" fill="currentColor"/></svg>',
+  pause: '<svg class="ico" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>',
+  sun: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>',
+  moon: '<svg class="ico" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>'
+};
 
 function defaultLabel(type) {
   if (type === "SWITCH") {
@@ -138,7 +200,7 @@ function defaultLabel(type) {
   if (type === "LED") return "Out " + (nodesOfType("LED").length + 1);
   if (type === "CONST") return "Const";
   if (type === "CLOCK") return "Clock";
-  return "Gate";
+  return type;
 }
 
 function createNodeEl(n) {
@@ -148,10 +210,7 @@ function createNodeEl(n) {
   else if (n.type === "CONST") body = '<button type="button" class="const">0</button>';
   else if (n.type === "CLOCK") body = '<div class="clock">CLK 0</div>';
   else if (n.type === "LED") body = '<div class="led"></div>';
-  else {
-    var violet = (n.type === "NAND" || n.type === "NOR" || n.type === "XOR" || n.type === "XNOR");
-    body = '<div class="n-type' + (violet ? " violet" : "") + '">' + n.type + "</div>";
-  }
+  else body = '<svg class="gate-svg" viewBox="0 0 112 56">' + gateShape(n.type) + "</svg>";
 
   var html = '<div class="n-head"><span class="n-label"></span></div><div class="n-body">' + body + "</div>";
   for (var i = 0; i < t.inputs; i++) {
@@ -242,20 +301,11 @@ function update() {
   drawWires();
 }
 
-function autosave() {
-  try {
-    localStorage.setItem("digitalDeskCircuit", takeSnapshot());
-  } catch (err) {
-    // storage can be blocked, that is okay
-  }
-}
-
 // call this after every change to the circuit
 function refresh() {
   update();
   $("empty").style.display = (nodes.length === 0) ? "grid" : "none";
   updateHistoryButtons();
-  autosave();
 }
 
 // ===================================================
@@ -771,7 +821,8 @@ function openTable() {
 // ===================================================
 function setRunning(flag) {
   running = flag;
-  $("btnRun").textContent = running ? "Running" : "Paused";
+  $("runIcon").innerHTML = running ? ICON.play : ICON.pause;
+  $("runText").textContent = running ? "Running" : "Paused";
   $("btnRun").classList.toggle("paused", !running);
 }
 
@@ -784,8 +835,43 @@ function flipClocks() {
 
 function setTheme(name) {
   document.documentElement.setAttribute("data-theme", name);
-  $("themeBtn").textContent = (name === "dark") ? "Light mode" : "Dark mode";
-  try { localStorage.setItem("digitalDeskTheme", name); } catch (err) { }
+  // the button shows the mode you will get when you press it
+  $("themeBtn").innerHTML = (name === "dark") ? ICON.sun + "Light mode" : ICON.moon + "Dark mode";
+  try { localStorage.setItem("digitalDeskTheme2", name); } catch (err) { }
+}
+
+// slide the bar on the right edge of the components list to make it wider or narrower
+function setSideWidth(px) {
+  var w = Math.max(230, Math.min(620, px));
+  document.querySelector(".app").style.setProperty("--side-w", w + "px");
+  try { localStorage.setItem("digitalDeskSideW", String(w)); } catch (err) { }
+}
+
+function setupResizer() {
+  var handle = $("resizer");
+  var app = document.querySelector(".app");
+  var sliding = false;
+
+  var saved = null;
+  try { saved = localStorage.getItem("digitalDeskSideW"); } catch (err) { }
+  if (saved) setSideWidth(Number(saved));
+
+  handle.addEventListener("pointerdown", function (e) {
+    sliding = true;
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  handle.addEventListener("pointermove", function (e) {
+    if (sliding) setSideWidth(e.clientX - app.getBoundingClientRect().left);
+  });
+  handle.addEventListener("pointerup", function () { sliding = false; });
+  handle.addEventListener("pointercancel", function () { sliding = false; });
+  handle.addEventListener("dblclick", function () { setSideWidth(250); });
+  handle.addEventListener("keydown", function (e) {
+    var now = document.querySelector(".side").getBoundingClientRect().width;
+    if (e.key === "ArrowLeft") { e.preventDefault(); setSideWidth(now - 20); }
+    if (e.key === "ArrowRight") { e.preventDefault(); setSideWidth(now + 20); }
+  });
 }
 
 function setupButtons() {
@@ -869,30 +955,19 @@ function setupButtons() {
 // Start
 // ===================================================
 function start() {
-  var theme = "dark";
-  try { theme = localStorage.getItem("digitalDeskTheme") || "dark"; } catch (err) { }
+  var theme = "light";   // always start in bright mode
+  try { theme = localStorage.getItem("digitalDeskTheme2") || "light"; } catch (err) { }
   setTheme(theme);
   setRunning(true);
+  addPaletteIcons();
   setupButtons();
+  setupResizer();
   showInfo("XOR");
 
-  // bring back the last circuit, or begin with the half adder
-  var saved = null;
-  try { saved = localStorage.getItem("digitalDeskCircuit"); } catch (err) { }
-  var loaded = false;
-  if (saved) {
-    try {
-      loadSnapshot(saved);
-      loaded = nodes.length > 0;
-    } catch (err) {
-      loaded = false;
-    }
-  }
-  if (loaded) fitView();
-  else loadPreset("half");
-  undoList = [];
-  redoList = [];
-  updateHistoryButtons();
+  // the board starts empty (and forget any circuit an older version saved)
+  try { localStorage.removeItem("digitalDeskCircuit"); } catch (err) { }
+  applyView();
+  refresh();
 }
 
 start();
