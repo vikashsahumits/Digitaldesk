@@ -30,30 +30,42 @@ h2, h3 { margin: 0; }
 .cyan { color: var(--wire-on); }
 
 /* ----- top bar ----- */
-.bar {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line);
-}
-.brand { display: flex; align-items: center; gap: 10px; }
+.bar { display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .logo {
-  height: 52px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; display: grid; place-items: center;
-  background: linear-gradient(135deg, #22d3ee, #7c5cff); color: #fff; font: 700 14px "JetBrains Mono", monospace;
+  flex: none; height: 104px; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden;
+  display: grid; place-items: center; border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #22d3ee, #7c5cff); color: #fff; font: 700 26px "JetBrains Mono", monospace;
 }
-.brand-name { font-weight: 700; font-size: 1.15rem; color: var(--wire-on); letter-spacing: 0.04em; }
-.brand-sub { font: 500 10px "JetBrains Mono", monospace; color: var(--mute); }
-.tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.group { display: flex; gap: 4px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.top-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand-name { font-weight: 700; font-size: 1.35rem; color: var(--wire-on); letter-spacing: 0.05em; }
+.brand-sub { font: 500 11px "JetBrains Mono", monospace; color: var(--mute); }
+
+/* navigation bar */
+.navbar { display: flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.group { display: flex; flex-direction: column; gap: 4px; padding: 6px 12px 8px; border-right: 1px solid var(--line); }
+.group:last-child { border-right: 0; }
+.cap { font: 700 9px "JetBrains Mono", monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); }
+.row { display: flex; align-items: center; gap: 6px; }
 
 .btn {
-  font: inherit; font-size: 0.9rem; color: var(--text); background: var(--card);
-  border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  display: inline-flex; align-items: center; font: inherit; font-size: 0.9rem; color: var(--text); background: var(--card);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; white-space: nowrap;
 }
 .btn:hover { border-color: var(--accent); }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn.run { background: #10b981; border-color: #10b981; color: #fff; font-weight: 700; }
 .btn.run.paused { background: #f59e0b; border-color: #f59e0b; color: #2b1d00; }
+.ico { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-right: 6px; }
+.ico.right { margin: 0 0 0 6px; }
+#themeBtn { padding: 8px 14px; font-weight: 700; }
 button:focus-visible, select:focus-visible, .pal-item:focus-visible { outline: 3px solid var(--wire-on); outline-offset: 2px; }
+@media (max-width: 860px) {
+  .bar { flex-wrap: wrap; }
+  .logo { height: 70px; }
+  .top-right { flex-basis: 100%; }
+}
 
 /* ----- layout ----- */
 .app { flex: 1; min-height: 0; display: grid; grid-template-columns: 250px 1fr; }
@@ -171,3 +183,42 @@ tr.now td { background: var(--glow); }
 
 /* logo picture (put your logo.png next to index.html) */
 .logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; display: block; }
+
+/* gate symbols (parts on the board and in the list) */
+.gate-svg { display: block; flex: none; width: 112px; height: 56px; }
+.sym-line { fill: none; stroke: var(--wire-off); stroke-width: 2.5; stroke-linecap: round; }
+.sym-body { fill: var(--card); stroke: var(--gate); stroke-width: 2.5; stroke-linejoin: round; }
+.sym-body.violet { stroke: var(--gate2); }
+.sym-arc { fill: none; stroke: var(--gate2); stroke-width: 2.5; stroke-linecap: round; }
+.n-body { height: 56px; }
+.node { height: 82px; }
+.pal-item .sym { width: 66px; height: 40px; }
+.sym-on { fill: var(--wire-on); stroke: none; }
+.sym-led { fill: none; stroke: var(--led); stroke-width: 2.5; }
+.sym-text { fill: var(--led); font: 700 18px "JetBrains Mono", monospace; }
+
+/* tighter navigation bar so it fits in one row */
+.group { padding: 6px 10px 8px; }
+.row { gap: 5px; }
+.navbar .btn { padding: 7px 10px; }
+#presets { max-width: 165px; }
+
+/* components list can be resized by sliding the bar on its right edge */
+.app { grid-template-columns: var(--side-w, 250px) 1fr; }
+.side { position: relative; }
+.pal-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.pal-item.wide { grid-column: auto; }
+.resizer {
+  position: absolute; top: 0; bottom: 0; right: -5px; width: 10px; z-index: 6;
+  cursor: col-resize; touch-action: none;
+}
+.resizer::after {
+  content: ""; position: absolute; top: 50%; left: 3px; width: 4px; height: 44px; margin-top: -22px;
+  border-radius: 2px; background: var(--line);
+}
+.resizer:hover::after, .resizer:focus-visible::after { background: var(--accent); }
+.resizer:focus-visible { outline: none; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .resizer { display: none; }
+}
